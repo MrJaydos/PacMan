@@ -13,35 +13,152 @@
 
   // ---------------------------------------------------------------------
   // Maze data. '#' wall, '.' dot, 'o' power pellet, ' ' empty (ghost house
-  // interior/door -- walkable, no pellet). Generated with a symmetric
-  // recursive-backtracker + braid pass, then flood-fill verified so every
-  // dot is reachable; see the project history for the generator.
+  // interior/door -- walkable, no pellet). Each layout was generated with a
+  // symmetric recursive-backtracker + braid pass, then flood-fill verified
+  // so every dot is reachable; see the project history for the generator.
+  // All five share the same fixed footprint -- ghost house box, door, exit,
+  // tunnel row, and corner pellets at the same coordinates -- so any layout
+  // can be dropped in for any level without touching the rest of the game.
+  // One board is picked per level (see mazeForLevel) so the game doesn't
+  // replay the same layout every board.
   // ---------------------------------------------------------------------
-  const MAZE = [
-    "###################",
-    "#o...............o#",
-    "#.###.###.###.###.#",
-    "#.#...#.#.#.#...#.#",
-    "#.#.###.#.#.###.#.#",
-    "#.#...#.....#...#.#",
-    "#.###.#######.###.#",
-    "#...#.........#...#",
-    "###.###.#.#.###.###",
-    "#.....### ###.....#",
-    "#.###.##   ##.###.#",
-    "......##   ##......",
-    "#.######   ######.#",
-    "#.#....#####....#.#",
-    "#.#.#####.#####.#.#",
-    "#.#.............#.#",
-    "#.#####.#.#.#####.#",
-    "#.#.....#.#.....#.#",
-    "#.#.#####.#####.#.#",
-    "#...#...#.#...#...#",
-    "#.###.#.#.#.#.###.#",
-    "#o....#.....#....o#",
-    "###################",
+  const MAZES = [
+    [
+      "###################",
+      "#o...............o#",
+      "#.###.###.###.###.#",
+      "#.#...#.#.#.#...#.#",
+      "#.#.###.#.#.###.#.#",
+      "#.#...#.....#...#.#",
+      "#.###.#######.###.#",
+      "#...#.........#...#",
+      "###.###.#.#.###.###",
+      "#.....### ###.....#",
+      "#.###.##   ##.###.#",
+      "......##   ##......",
+      "#.######   ######.#",
+      "#.#....#####....#.#",
+      "#.#.#####.#####.#.#",
+      "#.#.............#.#",
+      "#.#####.#.#.#####.#",
+      "#.#.....#.#.....#.#",
+      "#.#.#####.#####.#.#",
+      "#...#...#.#...#...#",
+      "#.###.#.#.#.#.###.#",
+      "#o....#.....#....o#",
+      "###################",
+    ],
+    [
+      "###################",
+      "#o...............o#",
+      "#.#.#.###.###.#.#.#",
+      "#...#...#.#...#...#",
+      "#######.#.#.#######",
+      "#.....#.#.#.#.....#",
+      "#.#.#.#.#.#.#.#.#.#",
+      "#.#.#...#.#...#.#.#",
+      "#.#.###.#.#.###.#.#",
+      "#.#...### ###...#.#",
+      "#.###.##   ##.###.#",
+      "..#....#   #....#..",
+      "#.#.####   ####.#.#",
+      "#.#....#####....#.#",
+      "#.#.#.###.###.#.#.#",
+      "#.#.#.........#.#.#",
+      "#.#.#.#######.#.#.#",
+      "#.#.............#.#",
+      "#.#######.#######.#",
+      "#.................#",
+      "#.#######.#######.#",
+      "#o...............o#",
+      "###################",
+    ],
+    [
+      "###################",
+      "#o...............o#",
+      "#.###.#.#.#.#.###.#",
+      "#.....#.#.#.#.....#",
+      "#.#####.#.#.#####.#",
+      "#.....#.#.#.#.....#",
+      "#.#.#.#.#.#.#.#.#.#",
+      "#...#.#.....#.#...#",
+      "#.###.###.###.###.#",
+      "#.#....## ##....#.#",
+      "#.#.####   ####.#.#",
+      "..#...##   ##...#..",
+      "#.###.##   ##.###.#",
+      "#.....#######.....#",
+      "###.#.#.###.#.#.###",
+      "#...#.#.....#.#...#",
+      "#.###.#.#.#.#.###.#",
+      "#...#.#.....#.#...#",
+      "#.#.#.###.###.#.#.#",
+      "#.#.#.#.....#.#.#.#",
+      "#.#.###.###.###.#.#",
+      "#o#.............#o#",
+      "###################",
+    ],
+    [
+      "###################",
+      "#o..#.........#..o#",
+      "###.#####.#####.###",
+      "#.#.............#.#",
+      "#.#######.#######.#",
+      "#.................#",
+      "#.#.###########.#.#",
+      "#.#.............#.#",
+      "#.###.#.#.#.#.###.#",
+      "#...#.### ###.#...#",
+      "#.#.#.##   ##.#.#.#",
+      "..#.#..#   #..#.#..",
+      "#.#.####   ####.#.#",
+      "#.#.#..#####..#.#.#",
+      "#.#.#.###.###.#.#.#",
+      "#...#.#.....#.#...#",
+      "#.###.#.#.#.#.###.#",
+      "#...#...#.#...#...#",
+      "###.#.#.#.#.#.#.###",
+      "#...#.#.#.#.#.#...#",
+      "#.#####.#.#.#####.#",
+      "#o...............o#",
+      "###################",
+    ],
+    [
+      "###################",
+      "#o...............o#",
+      "#.#######.#######.#",
+      "#.......#.#.......#",
+      "#.#######.#######.#",
+      "#.................#",
+      "#.###############.#",
+      "#...#.........#...#",
+      "###.#.###.###.#.###",
+      "#.#...### ###...#.#",
+      "#.###.##   ##.###.#",
+      "......##   ##......",
+      "#.######   ######.#",
+      "#.#...#######...#.#",
+      "#.#.#.###.###.#.#.#",
+      "#.#.#.........#.#.#",
+      "#.#.#####.#####.#.#",
+      "#.#.....#.#.....#.#",
+      "#.###.#.###.#.###.#",
+      "#...#.#.....#.#...#",
+      "#.#.#.###.###.#.#.#",
+      "#o...............o#",
+      "###################",
+    ],
   ];
+  // Reassigned per level by setMazeForLevel(); every layout above is the
+  // same 19x23 footprint so COLS/ROWS/TUNNEL_ROW etc. stay valid for all of them.
+  let MAZE = MAZES[0];
+  function mazeForLevel(level) {
+    return MAZES[(level - 1) % MAZES.length];
+  }
+  function setMazeForLevel(level) {
+    MAZE = mazeForLevel(level);
+  }
+
   const COLS = MAZE[0].length;
   const ROWS = MAZE.length;
   const TUNNEL_ROW = 11;
@@ -223,7 +340,10 @@
   function scatterChaseDurationFor(index) {
     const entry = MODE_SCHEDULE[Math.min(index, MODE_SCHEDULE.length - 1)];
     if (entry.mode === "scatter") {
-      return Math.max(2, entry.duration - (state.level - 1));
+      // Deeper levels get shorter (and eventually just one) breather before
+      // the permanent-chase jump below kicks in.
+      const floor = state.level >= 3 ? 1 : 2;
+      return Math.max(floor, entry.duration - (state.level - 1));
     }
     return entry.duration;
   }
@@ -232,8 +352,12 @@
     return Math.max(1.5, 7 - (state.level - 1) * 0.5);
   }
 
+  // Pac-Man moves at 6.2 tiles/sec (see makePacman). Ghosts start noticeably
+  // slower so early levels feel fair, then close the gap and overtake by the
+  // final level so chase mode is a real, escalating threat rather than
+  // background noise the player can always outrun in open corridors.
   function ghostNormalSpeed() {
-    return Math.min(4.6, 3.4 + (state.level - 1) * 0.15);
+    return Math.min(6.8, 5.3 + (state.level - 1) * 0.3);
   }
 
   // ---------------------------------------------------------------------
@@ -498,7 +622,14 @@
     const duration = scatterChaseDurationFor(state.modeIndex);
     if (state.modeTimer >= duration) {
       state.modeTimer = 0;
-      state.modeIndex = Math.min(state.modeIndex + 1, MODE_SCHEDULE.length - 1);
+      // From level 3 on, skip straight to the permanent-chase phase after
+      // just one scatter/chase cycle instead of alternating several times --
+      // ghosts stay on the hunt for most of the level.
+      if (state.level >= 3 && state.modeIndex >= 1) {
+        state.modeIndex = MODE_SCHEDULE.length - 1;
+      } else {
+        state.modeIndex = Math.min(state.modeIndex + 1, MODE_SCHEDULE.length - 1);
+      }
       state.globalMode = MODE_SCHEDULE[state.modeIndex].mode;
       for (const g of ghosts) {
         if (g.state === "active") {
@@ -564,6 +695,7 @@
 
   function advanceLevel() {
     state.level++;
+    setMazeForLevel(state.level);
     resetDots();
     resetPositions();
     enterReady();
@@ -856,6 +988,7 @@
     state.lives = 3;
     state.level = 1;
     state.elapsed = 0;
+    setMazeForLevel(1);
     resetDots();
     resetPositions();
     updateHud();
