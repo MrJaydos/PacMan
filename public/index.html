@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pac-Man</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-wrap">
+    <div id="hud">
+      <div id="hud-score">SCORE: <span id="score-value">0</span></div>
+      <div id="hud-level">LEVEL: <span id="level-value">1</span></div>
+      <div id="hud-lives">LIVES: <span id="lives-value">3</span></div>
+    </div>
+
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Start / menu overlay -->
+    <div id="menu-overlay" class="overlay">
+      <h1>PAC-MAN</h1>
+      <ol id="menu-leaderboard" class="leaderboard-list"></ol>
+      <p class="hint">Arrow keys or WASD to move &middot; P / Esc to pause</p>
+      <button id="start-button" type="button">Press Enter / Click to Start</button>
+    </div>
+
+    <!-- Pause overlay -->
+    <div id="pause-overlay" class="overlay hidden">
+      <h2>PAUSED</h2>
+      <p class="hint">Press P or Esc to resume</p>
+    </div>
+
+    <!-- Game over / win overlay -->
+    <div id="end-overlay" class="overlay hidden">
+      <h2 id="end-title">GAME OVER</h2>
+      <p id="end-score"></p>
+
+      <form id="name-form">
+        <label for="name-input">Enter your name to save your score:</label>
+        <input
+          id="name-input"
+          name="name"
+          type="text"
+          minlength="3"
+          maxlength="12"
+          autocomplete="off"
+          placeholder="3-12 letters"
+          required
+        />
+        <button type="submit">Submit Score</button>
+      </form>
+      <p id="submit-status" class="hint"></p>
+
+      <ol id="end-leaderboard" class="leaderboard-list"></ol>
+      <button id="restart-button" type="button">Play Again</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

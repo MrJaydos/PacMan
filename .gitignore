@@ -1,0 +1,19 @@
+node_modules/
+npm-debug.log*
+
+# SQLite leaderboard database -- never commit game data
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+/data
+
+.env
+.env.*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

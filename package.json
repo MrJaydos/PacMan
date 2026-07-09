@@ -1,0 +1,17 @@
+{
+  "name": "pacman-leaderboard",
+  "version": "1.0.0",
+  "description": "Browser Pac-Man with a persistent SQLite leaderboard",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.21.0"
+  }
+}
