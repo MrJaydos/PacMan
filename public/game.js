@@ -761,6 +761,12 @@
   };
 
   window.addEventListener("keydown", (e) => {
+    // Let normal typing happen when a form field (e.g. the high-score name
+    // input) has focus -- otherwise WASD/arrows/P/Escape get hijacked as
+    // game controls instead of reaching the text field.
+    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) {
+      return;
+    }
     if (e.key === "p" || e.key === "P" || e.key === "Escape") {
       togglePause();
       return;
